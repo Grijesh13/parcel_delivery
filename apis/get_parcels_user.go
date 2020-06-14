@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"parcelDelivery/db"
 	"parcelDelivery/global"
-	dto "parcelDelivery/request_dtos"
+	dto "parcelDelivery/request_dto"
 )
 
 func GetParcelsForUser(w http.ResponseWriter, r *http.Request) {
