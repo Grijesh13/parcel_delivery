@@ -15,12 +15,13 @@ func startHTTPServer() {
 	fmt.Println("starting http server")
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/signup", apis.SignUp).Methods("POST")
+	router.HandleFunc("/addparcel", apis.AddParcel).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 func main()  {
-	f()
-	//startHTTPServer()
+	//f()
+	startHTTPServer()
 
 	//ParcelImpl := db.ParcelsImpl{
 	//	DB : global.DB,
@@ -49,38 +50,70 @@ func main()  {
 
 // adding entries to es
 func f() {
-	o1 := esObj{
-		MyLoc: loc{
-			Lat: 12.12,
-			Long: 13.13,
+	//o1 := dto.ESParcel{
+	//	MyLoc: dto.Loc{
+	//		Lat: 12.12,
+	//		Long: 13.13,
+	//	},
+	//	Info: "info_1",
+	//}
+	//o2 := dto.ESParcel{
+	//	MyLoc: dto.Loc{
+	//		Lat: 1.1,
+	//		Long: 3.3,
+	//	},
+	//	Info: "info_2",
+	//}
+	//o3 := dto.ESParcel{
+	//	MyLoc: dto.Loc{
+	//		Lat: 6.6,
+	//		Long: 7.8,
+	//	},
+	//	Info: "info_3",
+	//}
+
+	o1 := map[string]interface{}{
+		"asd":  "info_1",
+		"myloc": map[string]interface{}{
+			"lat": 6.6,
+			"lon": 7.7,
 		},
-		info: "123123123",
 	}
-	o2 := esObj{
-		MyLoc: loc{
-			Lat: 12.144,
-			Long: 13.1312,
+
+	o2 := map[string]interface{}{
+		"asd":  "info_2",
+		"myloc": map[string]interface{}{
+			"lat": 6.6,
+			"lon": 7.7,
 		},
-		info: "456456",
+	}
+
+	o3 := map[string]interface{}{
+		"doc": map[string]interface{}{
+			"asd":  "info_3",
+			"myloc": map[string]interface{}{
+				"lat": -21.6,
+				"lon": 180,
+			},
+		},
 	}
 
 	payload, _ := json.Marshal(o1)
 	b := bytes.NewBuffer(payload)
-	_, e := global.ES.Index("test", b)
+	_, e := global.ES.Index("test", b, global.ES.Index.WithDocumentID("123"))
 	fmt.Println(e)
 
 	payload, _ = json.Marshal(o2)
 	b = bytes.NewBuffer(payload)
-	_, e = global.ES.Index("test", b)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("234"))
 	fmt.Println(e)
-}
 
-type esObj struct {
-	MyLoc loc   `json:"myloc"`
-	info string `json:"info"`
-}
+	payload, _ = json.Marshal(o3)
+	b = bytes.NewBuffer(payload)
+	re, e := global.ES.Update("test", "234", b)
 
-type loc struct {
-	Lat float64 `json:"lat"`
-	Long float64 `json:"lon"`
+	fmt.Println(re)
+	fmt.Println(e)
+
+	//_, e = global.ES.Delete("test", "234")
 }

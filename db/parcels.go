@@ -18,7 +18,7 @@ type ParcelsImpl struct {
 }
 
 func (impl *ParcelsImpl) AddParcel(parcel *dto.Parcel) error {
-	sqlQuery := "INSERT INTO parcel_delivery.parcels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
+	sqlQuery := "INSERT INTO parcel_delivery.parcels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
@@ -28,7 +28,7 @@ func (impl *ParcelsImpl) AddParcel(parcel *dto.Parcel) error {
 	_, err = stmt.Exec(parcel.ID, parcel.UserName, parcel.Note, parcel.Length, parcel.Breadth, parcel.Height,
 		parcel.Weight, parcel.Category, parcel.SourceAddress, parcel.DestinationAddress,
 		parcel.SourceLatitude, parcel.SourceLongitude, parcel.DestinationLatitude,
-		parcel.DestinationLongitude, parcel.CreatedAt)
+		parcel.DestinationLongitude, parcel.CreatedAt, parcel.Price, parcel.Status, nil)
 	sqlErr, ok := err.(*mysql.MySQLError)
 	if ok {
 		if sqlErr.Number == 1062 {
