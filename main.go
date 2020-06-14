@@ -9,13 +9,15 @@ import (
 	"net/http"
 	"parcelDelivery/apis"
 	"parcelDelivery/global"
+	"time"
 )
 
 func startHTTPServer() {
 	fmt.Println("starting http server")
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/signup", apis.SignUp).Methods("POST")
-	router.HandleFunc("/addparcel", apis.AddParcel).Methods("POST")
+	router.HandleFunc("/signUp", apis.SignUp).Methods("POST")
+	router.HandleFunc("/addParcel", apis.AddParcel).Methods("POST")
+	router.HandleFunc("/getParcelsForUser", apis.GetParcelsForUser).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
@@ -73,47 +75,220 @@ func f() {
 	//}
 
 	o1 := map[string]interface{}{
-		"asd":  "info_1",
+		"info":  "info_1",
 		"myloc": map[string]interface{}{
-			"lat": 6.6,
+			"lat": 1.6,
 			"lon": 7.7,
 		},
 	}
 
 	o2 := map[string]interface{}{
-		"asd":  "info_2",
+		"info":  "info_2",
 		"myloc": map[string]interface{}{
-			"lat": 6.6,
-			"lon": 7.7,
+			"lat": 6.8,
+			"lon": 7.9,
 		},
 	}
 
 	o3 := map[string]interface{}{
-		"doc": map[string]interface{}{
-			"asd":  "info_3",
-			"myloc": map[string]interface{}{
-				"lat": -21.6,
-				"lon": 180,
-			},
+		"info":  "info_3",
+		"myloc": map[string]interface{}{
+			"lat": -21.6,
+			"lon": 21,
+		},
+	}
+
+	o4 := map[string]interface{}{
+		"info":  "info_4",
+		"myloc": map[string]interface{}{
+			"lat": 6.8,
+			"lon": 10.3,
+		},
+	}
+
+	o5 := map[string]interface{}{
+		"info":  "info_5",
+		"myloc": map[string]interface{}{
+			"lat": 16.6,
+			"lon": 17.7,
+		},
+	}
+
+	o6 := map[string]interface{}{
+		"info":  "info_6",
+		"myloc": map[string]interface{}{
+			"lat": 11.6,
+			"lon": 12.7,
+		},
+	}
+
+	o7 := map[string]interface{}{
+		"info":  "info_7",
+		"myloc": map[string]interface{}{
+			"lat": 16.69,
+			"lon": 7.7,
+		},
+	}
+
+	o8 := map[string]interface{}{
+		"info":  "info_8",
+		"myloc": map[string]interface{}{
+			"lat": 5.6,
+			"lon": 9.7,
+		},
+	}
+
+	o9 := map[string]interface{}{
+		"info":  "info_9",
+		"myloc": map[string]interface{}{
+			"lat": 1.6,
+			"lon": 2.7,
+		},
+	}
+
+	o10 := map[string]interface{}{
+		"info":  "info_10",
+		"myloc": map[string]interface{}{
+			"lat": 10.6,
+			"lon": 19.7,
+		},
+	}
+
+	o11 := map[string]interface{}{
+		"info":  "info_11",
+		"myloc": map[string]interface{}{
+			"lat": -0.6,
+			"lon": -2.7,
+		},
+	}
+
+	o12 := map[string]interface{}{
+		"info":  "info_12",
+		"myloc": map[string]interface{}{
+			"lat": -16.6,
+			"lon": -17.7,
+		},
+	}
+
+	o13 := map[string]interface{}{
+		"info":  "info_13",
+		"myloc": map[string]interface{}{
+			"lat": -6.6,
+			"lon": -1.7,
+		},
+	}
+
+	o14 := map[string]interface{}{
+		"info":  "info_14",
+		"myloc": map[string]interface{}{
+			"lat": -1.6,
+			"lon": -17.7,
 		},
 	}
 
 	payload, _ := json.Marshal(o1)
 	b := bytes.NewBuffer(payload)
-	_, e := global.ES.Index("test", b, global.ES.Index.WithDocumentID("123"))
-	fmt.Println(e)
+	_, e := global.ES.Index("test", b, global.ES.Index.WithDocumentID("1"))
+	//fmt.Println(e)
 
 	payload, _ = json.Marshal(o2)
 	b = bytes.NewBuffer(payload)
-	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("234"))
-	fmt.Println(e)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("2"))
+	//fmt.Println(e)
 
 	payload, _ = json.Marshal(o3)
 	b = bytes.NewBuffer(payload)
-	re, e := global.ES.Update("test", "234", b)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("3"))
+	//fmt.Println(e)
 
-	fmt.Println(re)
-	fmt.Println(e)
+	payload, _ = json.Marshal(o4)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("4"))
+	//fmt.Println(e)
+
+	payload, _ = json.Marshal(o5)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("5"))
+
+	payload, _ = json.Marshal(o6)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("6"))
+	payload, _ = json.Marshal(o7)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("7"))
+	payload, _ = json.Marshal(o8)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("8"))
+	payload, _ = json.Marshal(o9)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("9"))
+	payload, _ = json.Marshal(o10)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("10"))
+	payload, _ = json.Marshal(o11)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("11"))
+	payload, _ = json.Marshal(o12)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("12"))
+	payload, _ = json.Marshal(o13)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("13"))
+	payload, _ = json.Marshal(o14)
+	b = bytes.NewBuffer(payload)
+	_, e = global.ES.Index("test", b, global.ES.Index.WithDocumentID("14"))
+
+	time.Sleep(2 * time.Second)
+
+	//fmt.Println(e)
+	//payload, _ = json.Marshal(o3)
+	//b = bytes.NewBuffer(payload)
+	//re, e := global.ES.Update("test", "234", b)
+	//
+	//fmt.Println(re)
+	//fmt.Println(e)
+
+	var response map[string]interface{}
+	var buf bytes.Buffer
+
+	sort := map[string]interface{}{
+		"sort": map[string]interface{}{
+			"_geo_distance": map[string]interface{}{
+				"myloc": map[string]interface{}{
+					"lat": 10,
+					"lon": 10,
+				},
+				"order": "asc",
+				"unit":  "km",
+			},
+		},
+	}
+
+	// We encode from map string-interface into json format.
+	if err := json.NewEncoder(&buf).Encode(sort); err != nil {
+		log.Fatalf("Error encoding query: %s", err)
+	}
+
+	search, e := global.ES.Search(
+		global.ES.Search.WithSize(20),
+		global.ES.Search.WithIndex("test"), // the index you defined in Elasticsearch
+		global.ES.Search.WithBody(&buf),
+		global.ES.Search.WithPretty(),
+	)
+
+	defer search.Body.Close()
+
+	if e != nil {
+		fmt.Println("error getting es searcg: ", e)
+	}
+
+	if err := json.NewDecoder(search.Body).Decode(&response); err != nil {
+		log.Fatalf("Error parsing the response body: %s", err)
+	}
+
+	//fmt.Println(response)
+	result := response["hits"].(map[string]interface{})["hits"]
+	fmt.Println(result)
 
 	//_, e = global.ES.Delete("test", "234")
 }

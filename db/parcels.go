@@ -10,11 +10,39 @@ import (
 
 type IParcels interface {
 	AddParcel(parcel *dto.Parcel) error
+	GetParcels(username string) []*dto.Parcel
 }
 
 type ParcelsImpl struct {
 	// db client
 	DB *sql.DB
+}
+
+func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
+	sqlQuery := "SELECT id, username, note, length, breadth, height, weight, category, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, created_at, status, price, completed_at FROM parcel_delivery.parcels WHERE username = ?"
+	stmt, err := impl.DB.Prepare(sqlQuery)
+	defer closeStmt(stmt)
+	if err != nil {
+		fmt.Printf("error preparing the get parcels user sql statement")
+		return nil
+	}
+	res, e := stmt.Query(username)
+	if e != nil {
+		fmt.Printf("error getting user parcels with error = %s", e.Error())
+		return nil
+	}
+	var parcels []*dto.Parcel
+	for res.Next() {
+		var parcel dto.Parcel
+		// need to map each attribute retrieved else people is empty
+		_ = res.Scan(&parcel.ID, &parcel.UserName, &parcel.Note, &parcel.Length, &parcel.Breadth,
+			&parcel.Height, &parcel.Weight, &parcel.Category, &parcel.SourceAddress,
+			&parcel.DestinationAddress, &parcel.SourceLatitude, &parcel.SourceLongitude,
+			&parcel.DestinationLatitude, &parcel.DestinationLongitude, &parcel.CreatedAt,
+			&parcel.Status, &parcel.Price, &parcel.CompletedAt)
+		parcels = append(parcels, &parcel)
+	}
+	return parcels
 }
 
 func (impl *ParcelsImpl) AddParcel(parcel *dto.Parcel) error {

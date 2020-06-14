@@ -61,7 +61,7 @@ func (up *UserProfileImpl) UpdatePhone(profile *dto.User) error {
 }
 
 func (up *UserProfileImpl) GetUserData(username string) *dto.User {
-	sqlQuery := "select username, password, country_code, phone_number, created_at from parcel_delivery.people where username = ?"
+	sqlQuery := "SELECT username, password, country_code, phone_number, created_at FROM parcel_delivery.people where username = ?"
 	stmt, err := up.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
