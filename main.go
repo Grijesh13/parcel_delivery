@@ -18,6 +18,7 @@ func startHTTPServer() {
 	router.HandleFunc("/signUp", apis.SignUp).Methods("POST")
 	router.HandleFunc("/addParcel", apis.AddParcel).Methods("POST")
 	router.HandleFunc("/getParcelsForUser", apis.GetParcelsForUser).Methods("POST")
+	router.HandleFunc("/getParcels", apis.GetParcels).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
@@ -270,10 +271,11 @@ func f() {
 	}
 
 	search, e := global.ES.Search(
-		global.ES.Search.WithSize(20),
+		global.ES.Search.WithSize(5),
 		global.ES.Search.WithIndex("test"), // the index you defined in Elasticsearch
 		global.ES.Search.WithBody(&buf),
 		global.ES.Search.WithPretty(),
+		global.ES.Search.WithFrom(5),
 	)
 
 	defer search.Body.Close()

@@ -2,9 +2,15 @@ package global
 
 const (
 	// STATUS OF A PARCEL
-	StatusPending = "pending"
+	StatusPending   = "pending"
 	StatusCompleted = "completed"
-	StatusRemoved = "removed"
+	StatusRemoved   = "removed"
+
+	// HOW MANY PARCELS OR TRAVELS TO LOAD
+	DefaultMany = 10
+
+	// ELASTIC_SEARCH INDEX NAME
+	ESIndex = "test"
 
 	// COUNTRY CODES
 )
