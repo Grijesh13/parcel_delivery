@@ -46,9 +46,14 @@ func initES() *elasticsearch.Client {
 	}
 	payload, _ := json.Marshal(setting)
 	b := bytes.NewBuffer(payload)
-	_, err = es.Indices.Create(ESIndex, es.Indices.Create.WithBody(b))
+	_, err = es.Indices.Create(ESParcelIndex, es.Indices.Create.WithBody(b))
 	if err != nil {
-		fmt.Println("error creating shards:", err)
+		fmt.Println("error creating shards for parcels:", err)
+		panic(err)
+	}
+	_, err = es.Indices.Create(ESTravelIndex, es.Indices.Create.WithBody(b))
+	if err != nil {
+		fmt.Println("error creating shards for travels:", err)
 		panic(err)
 	}
 	return es

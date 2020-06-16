@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-func AddParcel(w http.ResponseWriter, r *http.Request) {
-	var newEvent *dto.Parcel
+func AddTravel(w http.ResponseWriter, r *http.Request) {
+	var newEvent *dto.Travel
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -36,12 +36,12 @@ func AddParcel(w http.ResponseWriter, r *http.Request) {
 	newEvent.Status = global.StatusPending
 
 	c := make(chan error)
-	go insertParcelIntoES(newEvent, c)
+	go insertTravelIntoES(newEvent, c)
 
-	parcelProfiler := db.ParcelsImpl{
+	travelProfiler := db.TravelsImpl{
 		DB: global.DB,
 	}
-	err = parcelProfiler.AddParcel(newEvent)
+	err = travelProfiler.AddTravel(newEvent)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode("problem")
@@ -62,36 +62,31 @@ func AddParcel(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
-	esObj := dto.ESParcel{
+func insertTravelIntoES(travel *dto.Travel, c chan error) {
+	esObj := dto.ESTravel{
 		MyLoc: dto.Loc{
-			Lat: parcel.SourceLatitude,
-			Long: parcel.SourceLongitude,
+			Lat: travel.SourceLatitude,
+			Long: travel.SourceLongitude,
 		},
-		UserName: parcel.UserName,
-		Note: parcel.Note,
-		Length: parcel.Length,
-		Breadth: parcel.Breadth,
-		Height: parcel.Height,
-		Weight: parcel.Weight,
-		Category: parcel.Category,
-		SourceAddress: parcel.SourceAddress,
-		DestinationAddress: parcel.DestinationAddress,
-		SourceLatitude: parcel.SourceLatitude,
-		SourceLongitude: parcel.SourceLongitude,
-		DestinationLatitude: parcel.DestinationLatitude,
-		DestinationLongitude: parcel.DestinationLongitude,
-		CreatedAt: parcel.CreatedAt,
-		Status: parcel.Status,
-		Price: parcel.Price,
-		CompletedAt: parcel.CompletedAt,
+		UserName: travel.UserName,
+		Note: travel.Note,
+		Mode: travel.Mode,
+		SourceAddress: travel.SourceAddress,
+		DestinationAddress: travel.DestinationAddress,
+		SourceLatitude: travel.SourceLatitude,
+		SourceLongitude: travel.SourceLongitude,
+		DestinationLatitude: travel.DestinationLatitude,
+		DestinationLongitude: travel.DestinationLongitude,
+		CreatedAt: travel.CreatedAt,
+		Status: travel.Status,
+		CompletedAt: travel.CompletedAt,
 	}
 
 	payload, _ := json.Marshal(esObj)
 	b := bytes.NewBuffer(payload)
-	_, err := global.ES.Index(global.ESParcelIndex, b, global.ES.Index.WithDocumentID(parcel.ID))
+	_, err := global.ES.Index(global.ESTravelIndex, b, global.ES.Index.WithDocumentID(travel.ID))
 	if err != nil {
-		fmt.Println("error adding parcel to elastic search:", err.Error())
+		fmt.Println("error adding travel to elastic search:", err.Error())
 	}
 	c <- err
 }

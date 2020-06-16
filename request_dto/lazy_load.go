@@ -1,6 +1,6 @@
 package request_dto
 
-type LazyParcels struct {
+type LazyLoad struct {
 	From      int     `json:"from"`
 	Many      int     `json:"many"`	// if not mentioned use default value
 	Latitude  float64 `json:"latitude"`

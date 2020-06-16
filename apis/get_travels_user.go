@@ -10,7 +10,7 @@ import (
 	dto "parcelDelivery/request_dto"
 )
 
-func GetParcelsForUser(w http.ResponseWriter, r *http.Request) {
+func GetTravelsForUser(w http.ResponseWriter, r *http.Request) {
 	var newEvent *dto.User
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -25,22 +25,22 @@ func GetParcelsForUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	parcelImpl := db.ParcelsImpl{
+	travelImpl := db.TravelsImpl{
 		DB : global.DB,
 	}
-	userParcels := parcelImpl.GetParcels(newEvent.UserName)
-	userParcelsSorted := make(map[string][]dto2.Parcel)
-	for i := 0; i < len(userParcels); i++ {
-		if parcels, ok := userParcelsSorted[userParcels[i].Status]; ok {
-			parcels = append(parcels, *userParcels[i])
-			userParcelsSorted[userParcels[i].Status] = parcels
+	userTravels := travelImpl.GetTravels(newEvent.UserName)
+	userTravelsSorted := make(map[string][]dto2.Travel)
+	for i := 0; i < len(userTravels); i++ {
+		if travels, ok := userTravelsSorted[userTravels[i].Status]; ok {
+			travels = append(travels, *userTravels[i])
+			userTravelsSorted[userTravels[i].Status] = travels
 		} else {
-			var newParcels []dto2.Parcel
-			newParcels = append(newParcels, *userParcels[i])
-			userParcelsSorted[userParcels[i].Status] = newParcels
+			var newTravels []dto2.Travel
+			newTravels = append(newTravels, *userTravels[i])
+			userTravelsSorted[userTravels[i].Status] = newTravels
 		}
 	}
 
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(userParcelsSorted)
+	_ = json.NewEncoder(w).Encode(userTravelsSorted)
 }

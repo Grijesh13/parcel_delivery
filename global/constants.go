@@ -10,7 +10,8 @@ const (
 	DefaultMany = 10
 
 	// ELASTIC_SEARCH INDEX NAME
-	ESIndex = "test"
+	ESParcelIndex = "parcels"
+	ESTravelIndex = "travels"
 
 	// COUNTRY CODES
 )
