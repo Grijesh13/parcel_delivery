@@ -68,6 +68,10 @@ func insertTravelIntoES(travel *dto.Travel, c chan error) {
 			Lat: travel.SourceLatitude,
 			Long: travel.SourceLongitude,
 		},
+		MyDestLoc: dto.Loc{
+			Lat: travel.DestinationLatitude,
+			Long: travel.DestinationLongitude,
+		},
 		UserName: travel.UserName,
 		Note: travel.Note,
 		Mode: travel.Mode,

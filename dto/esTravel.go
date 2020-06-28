@@ -2,6 +2,7 @@ package dto
 
 type ESTravel struct {
 	MyLoc                Loc     `json:"myloc"`
+	MyDestLoc            Loc     `json:"mydest"`
 	UserName             string  `json:"username"`
 	Note                 string  `json:"note"`
 	Mode                 string  `json:"mode"`

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"parcelDelivery/global"
 	dto "parcelDelivery/request_dto"
+	"strconv"
 )
 
 func GetTravels(w http.ResponseWriter, r *http.Request) {
@@ -33,12 +34,40 @@ func GetTravels(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	var buf bytes.Buffer
 
+	var filter []map[string]interface{}
+	filter = append(filter, map[string]interface{}{
+		"geo_distance": map[string]interface{}{
+			"distance": strconv.Itoa(newEvent.SrcDistance) + "km",
+			"mysrc": map[string]interface{}{
+				"lat": newEvent.SrcLatitude,
+				"lon": newEvent.SrcLongitude,
+			},
+		},
+	})
+
+	if newEvent.DestGiven {
+		filter = append(filter, map[string]interface{}{
+			"geo_distance": map[string]interface{}{
+				"distance": strconv.Itoa(newEvent.DestDistance) + "km",
+				"mydest": map[string]interface{}{
+					"lat": newEvent.DestLatitude,
+					"lon": newEvent.DestLongitude,
+				},
+			},
+		})
+	}
+
 	sort := map[string]interface{}{
+		"query": map[string]interface{}{
+			"bool": map[string]interface{}{
+				"filter": filter,
+			},
+		},
 		"sort": map[string]interface{}{
 			"_geo_distance": map[string]interface{}{
-				"myloc": map[string]interface{}{
-					"lat": newEvent.Latitude,
-					"lon": newEvent.Longitude,
+				"mysrc": map[string]interface{}{
+					"lat": newEvent.SrcLatitude,
+					"lon": newEvent.SrcLongitude,
 				},
 				"order": "asc",
 				"unit":  "km",
@@ -56,7 +85,7 @@ func GetTravels(w http.ResponseWriter, r *http.Request) {
 
 	search, searchErr := global.ES.Search(
 		global.ES.Search.WithSize(newEvent.Many),
-		global.ES.Search.WithIndex(global.ESTravelIndex), // the index defined in Elasticsearch
+		global.ES.Search.WithIndex(global.ESTravelIndex), // the index defined in ES
 		global.ES.Search.WithBody(&buf),
 		global.ES.Search.WithPretty(),
 		global.ES.Search.WithFrom(newEvent.From),

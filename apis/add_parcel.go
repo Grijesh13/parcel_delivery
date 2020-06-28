@@ -64,9 +64,13 @@ func AddParcel(w http.ResponseWriter, r *http.Request) {
 
 func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 	esObj := dto.ESParcel{
-		MyLoc: dto.Loc{
+		MySrcLoc: dto.Loc{
 			Lat: parcel.SourceLatitude,
 			Long: parcel.SourceLongitude,
+		},
+		MyDestLoc: dto.Loc{
+			Lat: parcel.DestinationLatitude,
+			Long: parcel.DestinationLongitude,
 		},
 		UserName: parcel.UserName,
 		Note: parcel.Note,

@@ -10,7 +10,8 @@ type Mapping struct {
 }
 
 type Property struct {
-	MyLoc Geo `json:"myloc"`
+	MySrcLoc   Geo `json:"mysrc"`
+	MyDestLoc  Geo `json:"mydest"`
 }
 
 type Geo struct {

@@ -38,7 +38,10 @@ func initES() *elasticsearch.Client {
 		},
 		Mappings: dto.Mapping{
 			Properties: dto.Property{
-				MyLoc: dto.Geo{
+				MySrcLoc: dto.Geo{
+					Type: "geo_point",
+				},
+				MyDestLoc: dto.Geo{
 					Type: "geo_point",
 				},
 			},

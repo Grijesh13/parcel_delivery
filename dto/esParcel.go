@@ -1,7 +1,8 @@
 package dto
 
 type ESParcel struct {
-	MyLoc                Loc     `json:"myloc"`
+	MySrcLoc             Loc     `json:"mysrc"`
+	MyDestLoc            Loc     `json:"mydest"`
 	UserName             string  `json:"username"`
 	Note                 string  `json:"note"`
 	Length               int     `json:"length"`
