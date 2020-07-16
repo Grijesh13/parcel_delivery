@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
 	"parcelDelivery/dto"
+
+	"github.com/go-sql-driver/mysql"
 )
 
+// IUserProfile ...
 type IUserProfile interface {
 	AddUser(profile *dto.User) error
 	GetUserData(username string) *dto.User
@@ -15,11 +17,13 @@ type IUserProfile interface {
 	UpdatePhone(profile *dto.User) error
 }
 
+// UserProfileImpl ...
 type UserProfileImpl struct {
 	// db client
 	DB *sql.DB
 }
 
+// UpdatePassword ...
 func (up *UserProfileImpl) UpdatePassword(profile *dto.User) error {
 	sqlQuery := "UPDATE parcel_delivery.people SET password = ? WHERE username = ?"
 	stmt, err := up.DB.Prepare(sqlQuery)
@@ -40,6 +44,7 @@ func (up *UserProfileImpl) UpdatePassword(profile *dto.User) error {
 	return nil
 }
 
+// UpdatePhone ...
 func (up *UserProfileImpl) UpdatePhone(profile *dto.User) error {
 	sqlQuery := "UPDATE parcel_delivery.people SET country_code = ?, phone_number = ? WHERE username = ?"
 	stmt, err := up.DB.Prepare(sqlQuery)
@@ -60,6 +65,7 @@ func (up *UserProfileImpl) UpdatePhone(profile *dto.User) error {
 	return nil
 }
 
+// GetUserData ...
 func (up *UserProfileImpl) GetUserData(username string) *dto.User {
 	sqlQuery := "SELECT username, password, country_code, phone_number, created_at FROM parcel_delivery.people where username = ?"
 	stmt, err := up.DB.Prepare(sqlQuery)
@@ -82,6 +88,7 @@ func (up *UserProfileImpl) GetUserData(username string) *dto.User {
 	return nil
 }
 
+// AddUser ...
 func (up *UserProfileImpl) AddUser(profile *dto.User) error {
 	sqlQuery := "INSERT INTO parcel_delivery.people VALUES ( ?, ?, ?, ?, ? )"
 	stmt, err := up.DB.Prepare(sqlQuery)

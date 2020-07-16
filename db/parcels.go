@@ -2,24 +2,29 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
 	"parcelDelivery/dto"
+
+	"github.com/go-sql-driver/mysql"
 )
 
+// IParcels ...
 type IParcels interface {
 	AddParcel(parcel *dto.Parcel) error
 	GetParcels(username string) []*dto.Parcel
 }
 
+// ParcelsImpl ...
 type ParcelsImpl struct {
 	// db client
 	DB *sql.DB
 }
 
+// GetParcels ...
 func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
-	sqlQuery := "SELECT id, username, note, length, breadth, height, weight, category, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, created_at, status, price, completed_at FROM parcel_delivery.parcels WHERE username = ? ORDER BY created_at DESC"
+	sqlQuery := "SELECT id, username, note, items, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, ship_date, created_at, status, price, is_negotiable, completed_at FROM parcel_delivery.parcels WHERE username = ? ORDER BY created_at DESC"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
@@ -34,29 +39,41 @@ func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
 	var parcels []*dto.Parcel
 	for res.Next() {
 		var parcel dto.Parcel
-		// need to map each attribute retrieved else people is empty
-		_ = res.Scan(&parcel.ID, &parcel.UserName, &parcel.Note, &parcel.Length, &parcel.Breadth,
-			&parcel.Height, &parcel.Weight, &parcel.Category, &parcel.SourceAddress,
-			&parcel.DestinationAddress, &parcel.SourceLatitude, &parcel.SourceLongitude,
-			&parcel.DestinationLatitude, &parcel.DestinationLongitude, &parcel.CreatedAt,
-			&parcel.Status, &parcel.Price, &parcel.CompletedAt)
+		// need to map each attribute retrieved else parcel is empty
+		_ = res.Scan(&parcel.ID, &parcel.UserName, &parcel.Note, &parcel.SQLItems,
+			&parcel.SourceAddress, &parcel.DestinationAddress,
+			&parcel.SourceLatitude, &parcel.SourceLongitude,
+			&parcel.DestinationLatitude, &parcel.DestinationLongitude,
+			&parcel.ShipDate, &parcel.CreatedAt, &parcel.Status,
+			&parcel.Price, &parcel.IsNegotiable, &parcel.CompletedAt)
+		var items *[]dto.Item
+		er := json.Unmarshal([]byte(parcel.SQLItems), &items)
+		if er != nil {
+			fmt.Printf("error unmarshalling sql_items for parcels with error = %s", er.Error())
+			return nil
+		}
 		parcels = append(parcels, &parcel)
 	}
 	return parcels
 }
 
+// AddParcel ...
 func (impl *ParcelsImpl) AddParcel(parcel *dto.Parcel) error {
-	sqlQuery := "INSERT INTO parcel_delivery.parcels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
+	sqlQuery := "INSERT INTO parcel_delivery.parcels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
 		fmt.Println("error preparing the add parcel sql statement")
 		return errors.New("error preparing the add parcel sql statement")
 	}
-	_, err = stmt.Exec(parcel.ID, parcel.UserName, parcel.Note, parcel.Length, parcel.Breadth, parcel.Height,
-		parcel.Weight, parcel.Category, parcel.SourceAddress, parcel.DestinationAddress,
-		parcel.SourceLatitude, parcel.SourceLongitude, parcel.DestinationLatitude,
-		parcel.DestinationLongitude, parcel.CreatedAt, parcel.Price, parcel.Status, nil)
+	serItems, _ := json.Marshal(parcel.Items)
+	parcel.SQLItems = string(serItems)
+	_, err = stmt.Exec(parcel.ID, parcel.UserName, parcel.Note, parcel.SQLItems,
+		parcel.SourceAddress, parcel.DestinationAddress,
+		parcel.SourceLatitude, parcel.SourceLongitude,
+		parcel.DestinationLatitude, parcel.DestinationLongitude,
+		parcel.ShipDate, parcel.CreatedAt, parcel.Status,
+		parcel.Price, parcel.IsNegotiable, nil)
 	sqlErr, ok := err.(*mysql.MySQLError)
 	if ok {
 		if sqlErr.Number == 1062 {

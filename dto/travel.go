@@ -1,5 +1,6 @@
 package dto
 
+// Travel ...
 type Travel struct {
 	ID                   string  `json:"id"`
 	UserName             string  `json:"username"`
@@ -13,5 +14,7 @@ type Travel struct {
 	DestinationLongitude float64 `json:"dest_long"`
 	CreatedAt            string  `json:"created_at"`
 	Status               string  `json:"status"`
+	StartDate            string  `json:"start_date"`
+	EndDate              string  `json:"end_date"`
 	CompletedAt          string  `json:"completed_at"`
 }

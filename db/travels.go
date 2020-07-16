@@ -4,22 +4,26 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
 	"parcelDelivery/dto"
+
+	"github.com/go-sql-driver/mysql"
 )
 
+// ITravels ...
 type ITravels interface {
 	AddTravel(travel *dto.Travel) error
 	GetTravels(username string) []*dto.Travel
 }
 
+// TravelsImpl ...
 type TravelsImpl struct {
 	// db client
 	DB *sql.DB
 }
 
+// GetTravels ...
 func (impl *TravelsImpl) GetTravels(username string) []*dto.Travel {
-	sqlQuery := "SELECT id, username, note, mode, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, created_at, status, completed_at FROM parcel_delivery.travels WHERE username = ? ORDER BY created_at DESC"
+	sqlQuery := "SELECT id, username, note, mode, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, created_at, status, start_date, end_date, completed_at FROM parcel_delivery.travels WHERE username = ? ORDER BY created_at DESC"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
@@ -38,14 +42,15 @@ func (impl *TravelsImpl) GetTravels(username string) []*dto.Travel {
 		_ = res.Scan(&travel.ID, &travel.UserName, &travel.Note, &travel.Mode, &travel.SourceAddress,
 			&travel.DestinationAddress, &travel.SourceLatitude, &travel.SourceLongitude,
 			&travel.DestinationLatitude, &travel.DestinationLongitude, &travel.CreatedAt,
-			&travel.Status, &travel.CompletedAt)
+			&travel.Status, &travel.StartDate, &travel.EndDate, &travel.CompletedAt)
 		travels = append(travels, &travel)
 	}
 	return travels
 }
 
+// AddTravel ...
 func (impl *TravelsImpl) AddTravel(travel *dto.Travel) error {
-	sqlQuery := "INSERT INTO parcel_delivery.travels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
+	sqlQuery := "INSERT INTO parcel_delivery.travels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
@@ -55,7 +60,7 @@ func (impl *TravelsImpl) AddTravel(travel *dto.Travel) error {
 	_, err = stmt.Exec(travel.ID, travel.UserName, travel.Note, travel.Mode,
 		travel.SourceAddress, travel.DestinationAddress, travel.SourceLatitude,
 		travel.SourceLongitude, travel.DestinationLatitude, travel.DestinationLongitude,
-		travel.CreatedAt, travel.Status, nil)
+		travel.CreatedAt, travel.Status, travel.StartDate, travel.EndDate, nil)
 	sqlErr, ok := err.(*mysql.MySQLError)
 	if ok {
 		if sqlErr.Number == 1062 {

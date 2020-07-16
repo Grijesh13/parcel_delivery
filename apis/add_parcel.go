@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// AddParcel ...
 func AddParcel(w http.ResponseWriter, r *http.Request) {
 	var newEvent *dto.Parcel
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -63,32 +64,45 @@ func AddParcel(w http.ResponseWriter, r *http.Request) {
 }
 
 func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
+	numItems := 0
+	netWeight := 0
+	categoriesMap := make(map[string]bool)
+	var categories []string
+	for i := 0; i < len(parcel.Items); i++ {
+		numItems += parcel.Items[i].Number
+		netWeight += parcel.Items[i].Number * parcel.Items[i].Weight
+		categoriesMap[parcel.Items[i].Category] = true
+	}
+	for category := range categoriesMap {
+		categories = append(categories, category)
+	}
 	esObj := dto.ESParcel{
 		MySrcLoc: dto.Loc{
-			Lat: parcel.SourceLatitude,
+			Lat:  parcel.SourceLatitude,
 			Long: parcel.SourceLongitude,
 		},
 		MyDestLoc: dto.Loc{
-			Lat: parcel.DestinationLatitude,
+			Lat:  parcel.DestinationLatitude,
 			Long: parcel.DestinationLongitude,
 		},
-		UserName: parcel.UserName,
-		Note: parcel.Note,
-		Length: parcel.Length,
-		Breadth: parcel.Breadth,
-		Height: parcel.Height,
-		Weight: parcel.Weight,
-		Category: parcel.Category,
-		SourceAddress: parcel.SourceAddress,
-		DestinationAddress: parcel.DestinationAddress,
-		SourceLatitude: parcel.SourceLatitude,
-		SourceLongitude: parcel.SourceLongitude,
-		DestinationLatitude: parcel.DestinationLatitude,
+		UserName:             parcel.UserName,
+		Note:                 parcel.Note,
+		SourceAddress:        parcel.SourceAddress,
+		DestinationAddress:   parcel.DestinationAddress,
+		SourceLatitude:       parcel.SourceLatitude,
+		SourceLongitude:      parcel.SourceLongitude,
+		DestinationLatitude:  parcel.DestinationLatitude,
 		DestinationLongitude: parcel.DestinationLongitude,
-		CreatedAt: parcel.CreatedAt,
-		Status: parcel.Status,
-		Price: parcel.Price,
-		CompletedAt: parcel.CompletedAt,
+		CreatedAt:            parcel.CreatedAt,
+		Status:               parcel.Status,
+		Price:                parcel.Price,
+		CompletedAt:          parcel.CompletedAt,
+		IsNegotiable:         parcel.IsNegotiable,
+		ShipDate:             parcel.ShipDate,
+		NumberItems:          numItems,
+		NetWeight:            netWeight,
+		Categories:           categories,
+		Items:                parcel.Items,
 	}
 
 	payload, _ := json.Marshal(esObj)

@@ -11,6 +11,7 @@ import (
 	"strconv"
 )
 
+// GetParcels ...
 func GetParcels(w http.ResponseWriter, r *http.Request) {
 	var newEvent *dto.LazyLoad
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -34,6 +35,11 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 	var response map[string]interface{}
 	var buf bytes.Buffer
 
+	if newEvent.SrcDistance == 0 {
+		// set to default
+		newEvent.SrcDistance = 10
+	}
+
 	var filter []map[string]interface{}
 	filter = append(filter, map[string]interface{}{
 		"geo_distance": map[string]interface{}{
@@ -44,6 +50,11 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 	})
+
+	if newEvent.DestDistance == 0 {
+		// set to default
+		newEvent.DestDistance = 10
+	}
 
 	if newEvent.DestGiven {
 		filter = append(filter, map[string]interface{}{

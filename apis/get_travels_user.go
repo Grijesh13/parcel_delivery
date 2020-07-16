@@ -10,6 +10,7 @@ import (
 	dto "parcelDelivery/request_dto"
 )
 
+// GetTravelsForUser ...
 func GetTravelsForUser(w http.ResponseWriter, r *http.Request) {
 	var newEvent *dto.User
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -26,7 +27,7 @@ func GetTravelsForUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	travelImpl := db.TravelsImpl{
-		DB : global.DB,
+		DB: global.DB,
 	}
 	userTravels := travelImpl.GetTravels(newEvent.UserName)
 	userTravelsSorted := make(map[string][]dto2.Travel)

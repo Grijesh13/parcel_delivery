@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+// AddTravel ...
 func AddTravel(w http.ResponseWriter, r *http.Request) {
 	var newEvent *dto.Travel
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -57,33 +58,35 @@ func AddTravel(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.WriteHeader(http.StatusOK)
-			_ = json.NewEncoder(w).Encode("new parcel added")
+			_ = json.NewEncoder(w).Encode("new travel added")
 		}
 	}
 }
 
 func insertTravelIntoES(travel *dto.Travel, c chan error) {
 	esObj := dto.ESTravel{
-		MyLoc: dto.Loc{
-			Lat: travel.SourceLatitude,
+		MySrcLoc: dto.Loc{
+			Lat:  travel.SourceLatitude,
 			Long: travel.SourceLongitude,
 		},
 		MyDestLoc: dto.Loc{
-			Lat: travel.DestinationLatitude,
+			Lat:  travel.DestinationLatitude,
 			Long: travel.DestinationLongitude,
 		},
-		UserName: travel.UserName,
-		Note: travel.Note,
-		Mode: travel.Mode,
-		SourceAddress: travel.SourceAddress,
-		DestinationAddress: travel.DestinationAddress,
-		SourceLatitude: travel.SourceLatitude,
-		SourceLongitude: travel.SourceLongitude,
-		DestinationLatitude: travel.DestinationLatitude,
+		UserName:             travel.UserName,
+		Note:                 travel.Note,
+		Mode:                 travel.Mode,
+		SourceAddress:        travel.SourceAddress,
+		DestinationAddress:   travel.DestinationAddress,
+		SourceLatitude:       travel.SourceLatitude,
+		SourceLongitude:      travel.SourceLongitude,
+		DestinationLatitude:  travel.DestinationLatitude,
 		DestinationLongitude: travel.DestinationLongitude,
-		CreatedAt: travel.CreatedAt,
-		Status: travel.Status,
-		CompletedAt: travel.CompletedAt,
+		CreatedAt:            travel.CreatedAt,
+		Status:               travel.Status,
+		StartDate:            travel.StartDate,
+		EndDate:              travel.EndDate,
+		CompletedAt:          travel.CompletedAt,
 	}
 
 	payload, _ := json.Marshal(esObj)

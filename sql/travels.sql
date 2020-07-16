@@ -11,6 +11,8 @@
 --   `dest_long` DECIMAL(11, 8) NOT NULL,
 --   `created_at` datetime NOT NULL,
 --   `status` varchar(255) NOT NULL,
+--   `start_date` datetime NOT NULL,
+--   `end_date` datetime NOT NULL,
 --   `completed_at` datetime,
 --   PRIMARY KEY (`id`)
 -- );
@@ -19,3 +21,5 @@
 -- ADD FOREIGN KEY (username) REFERENCES parcel_delivery.people(username);
 
 -- SELECT * FROM parcel_delivery.travels;
+
+-- DROP TABLE parcel_delivery.travels;

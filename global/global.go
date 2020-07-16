@@ -6,10 +6,11 @@ import (
 	"encoding/json"
 	_ "encoding/json"
 	"fmt"
-	"github.com/elastic/go-elasticsearch"
-	_ "github.com/go-sql-driver/mysql"
 	"parcelDelivery/dto"
 	"time"
+
+	"github.com/elastic/go-elasticsearch"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
@@ -33,7 +34,7 @@ func initES() *elasticsearch.Client {
 	}
 	setting := dto.ESSetting{
 		Settings: dto.Setting{
-			Shards: 1,
+			Shards:   1,
 			Replicas: 0,
 		},
 		Mappings: dto.Mapping{
@@ -49,14 +50,15 @@ func initES() *elasticsearch.Client {
 	}
 	payload, _ := json.Marshal(setting)
 	b := bytes.NewBuffer(payload)
-	_, err = es.Indices.Create(ESParcelIndex, es.Indices.Create.WithBody(b))
-	if err != nil {
-		fmt.Println("error creating shards for parcels:", err)
-		panic(err)
-	}
+	a := bytes.NewBuffer(payload)
 	_, err = es.Indices.Create(ESTravelIndex, es.Indices.Create.WithBody(b))
 	if err != nil {
 		fmt.Println("error creating shards for travels:", err)
+		panic(err)
+	}
+	_, err = es.Indices.Create(ESParcelIndex, es.Indices.Create.WithBody(a))
+	if err != nil {
+		fmt.Println("error creating shards for parcels:", err)
 		panic(err)
 	}
 	return es
@@ -64,8 +66,8 @@ func initES() *elasticsearch.Client {
 
 func initSQL() *sql.DB {
 	// open up a database connection
-	db, err:= sql.Open("mysql",
-		dbUser + ":" + dbPassword + "@(" + dbHost + ":" + dbPort + ")/")
+	db, err := sql.Open("mysql",
+		dbUser+":"+dbPassword+"@("+dbHost+":"+dbPort+")/")
 	if err != nil {
 		fmt.Println("Connection Failed!!")
 		panic(err)
