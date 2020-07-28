@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"parcelDelivery/apis"
+
+	"github.com/gorilla/mux"
 )
 
 func startHTTPServer() {
@@ -21,9 +23,13 @@ func startHTTPServer() {
 	router.HandleFunc("/addTravel", apis.AddTravel).Methods("POST")
 	router.HandleFunc("/getTravelsForUser", apis.GetParcelsForUser).Methods("POST")
 	router.HandleFunc("/getTravels", apis.GetTravels).Methods("POST")
+	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode("health check")
+	}).Methods("GET")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func main()  {
+func main() {
 	startHTTPServer()
 }
