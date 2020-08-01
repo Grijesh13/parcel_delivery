@@ -26,7 +26,7 @@ func GetParcelsForUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parcelImpl := db.ParcelsImpl{
-		DB : global.DB,
+		DB: global.DB,
 	}
 	userParcels := parcelImpl.GetParcels(newEvent.UserName)
 	userParcelsSorted := make(map[string][]dto2.Parcel)
