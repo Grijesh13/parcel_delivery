@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -89,9 +89,16 @@ func insertTravelIntoES(travel *dto.Travel, c chan error) {
 		CompletedAt:          travel.CompletedAt,
 	}
 
-	payload, _ := json.Marshal(esObj)
-	b := bytes.NewBuffer(payload)
-	_, err := global.ES.Index(global.ESTravelIndex, b, global.ES.Index.WithDocumentID(travel.ID))
+	//payload, _ := json.Marshal(esObj)
+	//b := bytes.NewBuffer(payload)
+	//_, err := global.ES.Index(global.ESTravelIndex, b, global.ES.Index.WithDocumentID(travel.ID))
+
+	_, err := global.ES2.Index().
+		Index(global.ESTravelIndex).
+		Id(travel.ID).
+		BodyJson(esObj).
+		Do(context.Background())
+
 	if err != nil {
 		fmt.Println("error adding travel to elastic search:", err.Error())
 	}

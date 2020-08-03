@@ -24,9 +24,9 @@ import (
 )
 
 const (
-	dbUser     = "root"
-	dbPassword = "JustDoIt1308!"
-	dbHost     = "localhost"
+	dbUser     = "admin"
+	dbPassword = "db$123456"
+	dbHost     = "database-1.cisb0uvrjg3i.ap-southeast-1.rds.amazonaws.com"
 	dbPort     = "3306"
 )
 
@@ -44,7 +44,11 @@ var ES = initES()
 var ES2 = initES2()
 
 func initES() *elasticsearch.Client {
-	es, err := elasticsearch.NewDefaultClient()
+	return &elasticsearch.Client{}
+	es, err := elasticsearch.NewClient(elasticsearch.Config{
+		Addresses: nil,
+		Transport: nil,
+	})
 	if err != nil {
 		fmt.Println("ES Connection Failed!!")
 		panic(err)
@@ -132,6 +136,22 @@ func initES2() *elastic.Client {
 	}
 	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
 
+	setting := dto.ESSetting{
+		Settings: dto.Setting{
+			Shards:   1,
+			Replicas: 0,
+		},
+		Mappings: dto.Mapping{
+			Properties: dto.Property{
+				MySrcLoc: dto.Geo{
+					Type: "geo_point",
+				},
+				MyDestLoc: dto.Geo{
+					Type: "geo_point",
+				},
+			},
+		},
+	}
 	// Use the IndexExists service to check if a specified index exists.
 	exists, err := client.IndexExists(ESTravelIndex).Do(context.Background())
 	if err != nil {
@@ -139,22 +159,6 @@ func initES2() *elastic.Client {
 		panic("IndexExists panic" + err.Error())
 	}
 	if !exists {
-		setting := dto.ESSetting{
-			Settings: dto.Setting{
-				Shards:   1,
-				Replicas: 0,
-			},
-			Mappings: dto.Mapping{
-				Properties: dto.Property{
-					MySrcLoc: dto.Geo{
-						Type: "geo_point",
-					},
-					MyDestLoc: dto.Geo{
-						Type: "geo_point",
-					},
-				},
-			},
-		}
 		payload, _ := json.Marshal(setting)
 
 		createIndex, err := client.CreateIndex(ESTravelIndex).Body(string(payload)).Do(context.Background())
@@ -166,6 +170,26 @@ func initES2() *elastic.Client {
 			println("Not Ack for Travel index")
 		}
 		println("travel index created", createIndex.Index)
+	}
+
+	// Use the IndexExists service to check if a specified index exists.
+	exists, err = client.IndexExists(ESParcelIndex).Do(context.Background())
+	if err != nil {
+		// Handle error
+		panic("IndexExists panic" + err.Error())
+	}
+	if !exists {
+		payload, _ := json.Marshal(setting)
+
+		createIndex, err := client.CreateIndex(ESParcelIndex).Body(string(payload)).Do(context.Background())
+		if err != nil {
+			// Handle error
+			panic(err)
+		}
+		if !createIndex.Acknowledged {
+			println("Not Ack for Parcel index")
+		}
+		println("parcel index created", createIndex.Index)
 	}
 
 	return client

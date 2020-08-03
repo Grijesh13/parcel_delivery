@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -105,9 +105,16 @@ func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 		Items:                parcel.Items,
 	}
 
-	payload, _ := json.Marshal(esObj)
-	b := bytes.NewBuffer(payload)
-	_, err := global.ES.Index(global.ESParcelIndex, b, global.ES.Index.WithDocumentID(parcel.ID))
+	//payload, _ := json.Marshal(esObj)
+	//b := bytes.NewBuffer(payload)
+	//_, err := global.ES.Index(global.ESParcelIndex, b, global.ES.Index.WithDocumentID(parcel.ID))
+
+	_, err := global.ES2.Index().
+		Index(global.ESParcelIndex).
+		Id(parcel.ID).
+		BodyJson(esObj).
+		Do(context.Background())
+
 	if err != nil {
 		fmt.Println("error adding parcel to elastic search:", err.Error())
 	}
