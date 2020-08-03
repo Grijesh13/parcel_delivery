@@ -1,14 +1,16 @@
 package apis
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"parcelDelivery/global"
 	dto "parcelDelivery/request_dto"
+	responseDto "parcelDelivery/dto/response"
+	"github.com/olivere/elastic/v7"
 	"strconv"
+	"context"
 )
 
 // GetParcels ...
@@ -32,8 +34,8 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 		newEvent.Many = global.DefaultMany
 	}
 
-	var response map[string]interface{}
-	var buf bytes.Buffer
+	// var response map[string]interface{}
+	// var buf bytes.Buffer
 
 	if newEvent.SrcDistance == 0 {
 		// set to default
@@ -86,21 +88,13 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	// encode from map string-interface into json format
-	if err := json.NewEncoder(&buf).Encode(sort); err != nil {
-		fmt.Println("error in encoding query:", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		_ = json.NewEncoder(w).Encode("problem")
-		return
-	}
-
-	search, searchErr := global.ES.Search(
-		global.ES.Search.WithSize(newEvent.Many),
-		global.ES.Search.WithIndex(global.ESParcelIndex), // the index defined in ES
-		global.ES.Search.WithBody(&buf),
-		global.ES.Search.WithPretty(),
-		global.ES.Search.WithFrom(newEvent.From),
-	)
+	query, _ := json.Marshal(sort)
+	search, searchErr :=	global.ES2.Search().
+															Index(global.ESParcelIndex).
+															Source(string(query)).
+															From(newEvent.From).
+															Size(newEvent.Many).
+															Do(context.Background())
 
 	if searchErr != nil {
 		fmt.Println("error preparing es search for parcels query:", searchErr.Error())
@@ -108,16 +102,34 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewEncoder(w).Encode("problem")
 		return
 	}
-	defer search.Body.Close()
 
-	if err := json.NewDecoder(search.Body).Decode(&response); err != nil {
-		fmt.Println("error parsing the response body for es search:", err.Error())
+	parcels, err := decodeParcels(search)
+	if err != nil {
+		fmt.Println("error decoding es search for parcels query:", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode("problem")
 		return
 	}
 
-	result := response["hits"].(map[string]interface{})["hits"]
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(result)
+	_ = json.NewEncoder(w).Encode(parcels)
+}
+
+func decodeParcels(res *elastic.SearchResult) ([]*responseDto.Parcel, error) {
+	if res == nil || res.TotalHits() == 0 {
+		return nil, nil
+	}
+	var parcels []*responseDto.Parcel
+	for _, hit := range res.Hits.Hits {
+		parcel := new(responseDto.Parcel)
+		if err := json.Unmarshal(hit.Source, parcel); err != nil {
+			return nil, err
+		}
+		parcel.ID = hit.Id
+		if len(hit.Sort) > 0 {
+			parcel.Distance = hit.Sort[0].(float64)
+		}
+		parcels = append(parcels, parcel)
+	}
+	return parcels, nil
 }
