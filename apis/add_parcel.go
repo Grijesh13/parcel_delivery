@@ -76,6 +76,10 @@ func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 	for category := range categoriesMap {
 		categories = append(categories, category)
 	}
+
+	sDate, _ := time.Parse("2006-01-02 15:04:05", parcel.ShipDate)
+	uDate := sDate.Format("2006-01-02")
+
 	esObj := dto.ESParcel{
 		MySrcLoc: dto.Loc{
 			Lat:  parcel.SourceLatitude,
@@ -85,6 +89,7 @@ func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 			Lat:  parcel.DestinationLatitude,
 			Long: parcel.DestinationLongitude,
 		},
+		PickUpStart:          uDate,
 		UserName:             parcel.UserName,
 		Note:                 parcel.Note,
 		SourceAddress:        parcel.SourceAddress,

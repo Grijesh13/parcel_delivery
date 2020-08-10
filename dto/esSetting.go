@@ -15,6 +15,12 @@ type Mapping struct {
 type Property struct {
 	MySrcLoc  Geo `json:"mysrc"`
 	MyDestLoc Geo `json:"mydest"`
+	PickUpStart ESDate `json:"pick_up_start"`
+}
+
+type ESDate struct {
+	Type   string `json:"type"`
+	Format string `json:"format"`
 }
 
 // Geo ...

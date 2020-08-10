@@ -3,6 +3,7 @@ package apis
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 	"io/ioutil"
 	"net/http"
 	"parcelDelivery/global"
@@ -69,6 +70,32 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 	}
+
+	sDate, _ := time.Parse("2006-01-02 15:04:05", "2020-08-06 15:04:05")
+	uDate := sDate.Format("2006-01-02")
+
+	eDate, _ := time.Parse("2006-01-02 15:04:05", "2020-08-07 15:04:05")
+	uuDate := eDate.Format("2006-01-02")
+
+	fmt.Printf("%v", sDate)
+	fmt.Printf("%v", uDate)
+
+	var must []map[string]interface{}
+	must = append(must, map[string]interface{}{
+		"range": map[string]interface{}{
+			"pick_up_start": map[string]interface{}{
+				"gte": uDate,
+				"lte": uuDate,
+				"format": "yyyy-MM-dd",
+			},
+		},
+	})
+
+	filter = append(filter, map[string]interface{}{
+		"bool": map[string]interface{}{
+			"must": must,
+    },
+	})
 
 	sort := map[string]interface{}{
 		"query": map[string]interface{}{
