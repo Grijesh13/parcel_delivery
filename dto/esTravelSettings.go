@@ -1,21 +1,22 @@
 package dto
 
-// ESSetting ...
-type ESSetting struct {
+// ESTravelSetting ...
+type ESTravelSetting struct {
 	Settings Setting `json:"settings"`
-	Mappings Mapping `json:"mappings"`
+	Mappings TravelMapping `json:"mappings"`
 }
 
-// Mapping ...
-type Mapping struct {
-	Properties Property `json:"properties"`
+// TravelMapping ...
+type TravelMapping struct {
+	Properties TravelProperty `json:"properties"`
 }
 
-// Property ...
-type Property struct {
+// TravelProperty ...
+type TravelProperty struct {
 	MySrcLoc  Geo `json:"mysrc"`
 	MyDestLoc Geo `json:"mydest"`
-	PickUpStart ESDate `json:"pick_up_start"`
+	StartDate ESDate `json:"start_date"`
+	EndDate ESDate `json:"end_date"`
 }
 
 type ESDate struct {

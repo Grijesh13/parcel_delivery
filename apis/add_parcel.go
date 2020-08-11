@@ -30,7 +30,7 @@ func AddParcel(w http.ResponseWriter, r *http.Request) {
 
 	// set the created_at for the new user to be added
 	currentTime := time.Now()
-	currentTS := currentTime.Format("2006-01-02 15:04:05")
+	currentTS := currentTime.Format("2006-01-02")
 	newEvent.CreatedAt = currentTS
 
 	// set the status
@@ -77,9 +77,6 @@ func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 		categories = append(categories, category)
 	}
 
-	sDate, _ := time.Parse("2006-01-02 15:04:05", parcel.ShipDate)
-	uDate := sDate.Format("2006-01-02")
-
 	esObj := dto.ESParcel{
 		MySrcLoc: dto.Loc{
 			Lat:  parcel.SourceLatitude,
@@ -89,7 +86,6 @@ func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 			Lat:  parcel.DestinationLatitude,
 			Long: parcel.DestinationLongitude,
 		},
-		PickUpStart:          uDate,
 		UserName:             parcel.UserName,
 		Note:                 parcel.Note,
 		SourceAddress:        parcel.SourceAddress,
@@ -103,7 +99,8 @@ func insertParcelIntoES(parcel *dto.Parcel, c chan error) {
 		Price:                parcel.Price,
 		CompletedAt:          parcel.CompletedAt,
 		IsNegotiable:         parcel.IsNegotiable,
-		ShipDate:             parcel.ShipDate,
+		PickUpStart:          parcel.PickUpStart,
+		PickUpEnd:            parcel.PickUpEnd,
 		NumberItems:          numItems,
 		NetWeight:            netWeight,
 		Categories:           categories,

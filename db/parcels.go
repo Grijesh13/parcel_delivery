@@ -24,7 +24,7 @@ type ParcelsImpl struct {
 
 // GetParcels ...
 func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
-	sqlQuery := "SELECT id, username, note, items, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, ship_date, created_at, status, price, is_negotiable, completed_at FROM parcel_delivery.parcels WHERE username = ? ORDER BY created_at DESC"
+	sqlQuery := "SELECT id, username, note, items, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, pick_up_start, pick_up_end, created_at, status, price, is_negotiable, completed_at FROM parcel_delivery.parcels WHERE username = ? ORDER BY created_at DESC"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
@@ -44,7 +44,7 @@ func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
 			&parcel.SourceAddress, &parcel.DestinationAddress,
 			&parcel.SourceLatitude, &parcel.SourceLongitude,
 			&parcel.DestinationLatitude, &parcel.DestinationLongitude,
-			&parcel.ShipDate, &parcel.CreatedAt, &parcel.Status,
+			&parcel.PickUpStart, &parcel.PickUpEnd, &parcel.CreatedAt, &parcel.Status,
 			&parcel.Price, &parcel.IsNegotiable, &parcel.CompletedAt)
 		var items *[]dto.Item
 		er := json.Unmarshal([]byte(parcel.SQLItems), &items)
@@ -59,7 +59,7 @@ func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
 
 // AddParcel ...
 func (impl *ParcelsImpl) AddParcel(parcel *dto.Parcel) error {
-	sqlQuery := "INSERT INTO parcel_delivery.parcels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
+	sqlQuery := "INSERT INTO parcel_delivery.parcels VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {
@@ -72,7 +72,7 @@ func (impl *ParcelsImpl) AddParcel(parcel *dto.Parcel) error {
 		parcel.SourceAddress, parcel.DestinationAddress,
 		parcel.SourceLatitude, parcel.SourceLongitude,
 		parcel.DestinationLatitude, parcel.DestinationLongitude,
-		parcel.ShipDate, parcel.CreatedAt, parcel.Status,
+		parcel.PickUpStart, parcel.PickUpEnd, parcel.CreatedAt, parcel.Status,
 		parcel.Price, parcel.IsNegotiable, nil)
 	sqlErr, ok := err.(*mysql.MySQLError)
 	if ok {

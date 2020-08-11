@@ -22,9 +22,9 @@ import (
 )
 
 const (
-	dbUser     = "root"
-	dbPassword = "JustDoIt1308!"
-	dbHost     = "localhost"
+	dbUser     = "admin"
+	dbPassword = "db$123456"
+	dbHost     = "database-1.cisb0uvrjg3i.ap-southeast-1.rds.amazonaws.com"
 	dbPort     = "3306"
 )
 
@@ -37,7 +37,7 @@ const (
 var DB = initSQL()
 
 // ES is the Elastic Search client
-var ES2 = initES2()
+var ES2 = initES()
 
 func initSQL() *sql.DB {
 	// open up a database connection
@@ -59,7 +59,7 @@ func initSQL() *sql.DB {
 	return db
 }
 
-func initES2() *elastic.Client {
+func initES() *elastic.Client {
 	sess := session.Must(session.NewSession())
 	creds := credentials.NewCredentials(&ec2rolecreds.EC2RoleProvider{
 		Client: ec2metadata.New(sess),
@@ -69,14 +69,13 @@ func initES2() *elastic.Client {
 	if err != nil {
 		panic("Elastic failed to initialize, AWS Error: " + err.Error())
 	}
-	println(awsClient)
 	client, err := elastic.NewClient(
-		// elastic.SetURL("https://search-dev-parcel-delivery-6egqf5z3c3z7borcxhoxrv7le4.ap-southeast-1.es.amazonaws.com"),
-		// elastic.SetScheme("https"),
-		// elastic.SetHttpClient(awsClient),
-		// elastic.SetSniff(false),
-		// elastic.SetHealthcheck(false),
-		//elastic.SetBasicAuth(esUser, esPsw),
+		elastic.SetURL("https://search-dev-parcel-delivery-6egqf5z3c3z7borcxhoxrv7le4.ap-southeast-1.es.amazonaws.com"),
+		elastic.SetScheme("https"),
+		elastic.SetHttpClient(awsClient),
+		elastic.SetSniff(false),
+		elastic.SetHealthcheck(false),
+		elastic.SetBasicAuth(esUser, esPsw),
 	)
 	if err != nil {
 		panic("Elastic failed to initialize , Err: " + err.Error())
@@ -89,49 +88,58 @@ func initES2() *elastic.Client {
 	// 	panic("Ping Error" + err.Error())
 	// }
 
-	// travelSetting := dto.ESSetting{
-	// 	Settings: dto.Setting{
-	// 		Shards:   1,
-	// 		Replicas: 0,
-	// 	},
-	// 	Mappings: dto.Mapping{
-	// 		Properties: dto.Property{
-	// 			MySrcLoc: dto.Geo{
-	// 				Type: "geo_point",
-	// 			},
-	// 			MyDestLoc: dto.Geo{
-	// 				Type: "geo_point",
-	// 			},
-	// 		},
-	// 	},
-	// }
-	// // Use the IndexExists service to check if a specified index exists.
-	// exists, err := client.IndexExists(ESTravelIndex).Do(context.Background())
-	// if err != nil {
-	// 	// Handle error
-	// 	panic("IndexExists panic" + err.Error())
-	// }
-	// if !exists {
-	// 	payload, _ := json.Marshal(travelSetting)
-	//
-	// 	createIndex, err := client.CreateIndex(ESTravelIndex).Body(string(payload)).Do(context.Background())
-	// 	if err != nil {
-	// 		// Handle error
-	// 		panic(err)
-	// 	}
-	// 	if !createIndex.Acknowledged {
-	// 		println("Not Ack for Travel index")
-	// 	}
-	// 	println("travel index created", createIndex.Index)
-	// }
-
-	parcelSetting := dto.ESSetting{
+	travelSetting := dto.ESTravelSetting{
 		Settings: dto.Setting{
 			Shards:   1,
 			Replicas: 0,
 		},
-		Mappings: dto.Mapping{
-			Properties: dto.Property{
+		Mappings: dto.TravelMapping{
+			Properties: dto.TravelProperty{
+				MySrcLoc: dto.Geo{
+					Type: "geo_point",
+				},
+				MyDestLoc: dto.Geo{
+					Type: "geo_point",
+				},
+				StartDate: dto.ESDate{
+					Type:   "date",
+					Format: "yyyy-MM-dd",
+				},
+				EndDate: dto.ESDate{
+					Type:   "date",
+					Format: "yyyy-MM-dd",
+				},
+			},
+		},
+	}
+
+	// Use the IndexExists service to check if a specified index exists.
+	exists, err := client.IndexExists(ESTravelIndex).Do(context.Background())
+	if err != nil {
+		// Handle error
+		panic("IndexExists panic" + err.Error())
+	}
+	if !exists {
+		payload, _ := json.Marshal(travelSetting)
+
+		createIndex, err := client.CreateIndex(ESTravelIndex).Body(string(payload)).Do(context.Background())
+		if err != nil {
+			// Handle error
+			panic(err)
+		}
+		if !createIndex.Acknowledged {
+			println("Not Ack for Travel index")
+		}
+		println("travel index created", createIndex.Index)
+	}
+
+	parcelSetting := dto.ESParcelSetting{
+		Settings: dto.Setting{
+			Shards:   1,
+			Replicas: 0,
+		},
+		Mappings: dto.ParcelMapping{
+			Properties: dto.ParcelProperty{
 				MySrcLoc: dto.Geo{
 					Type: "geo_point",
 				},
@@ -142,12 +150,16 @@ func initES2() *elastic.Client {
 	        Type:   "date",
         	Format: "yyyy-MM-dd",
       	},
+				PickUpEnd: dto.ESDate{
+	        Type:   "date",
+        	Format: "yyyy-MM-dd",
+      	},
 			},
 		},
 	}
 
 	// Use the IndexExists service to check if a specified index exists.
-	exists, err := client.IndexExists(ESParcelIndex).Do(context.Background())
+	exists, err = client.IndexExists(ESParcelIndex).Do(context.Background())
 	if err != nil {
 		// Handle error
 		panic("IndexExists panic" + err.Error())

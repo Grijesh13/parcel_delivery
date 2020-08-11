@@ -11,8 +11,8 @@
 --   `dest_long` DECIMAL(11, 8) NOT NULL,
 --   `created_at` datetime NOT NULL,
 --   `status` varchar(255) NOT NULL,
---   `start_date` datetime NOT NULL,
---   `end_date` datetime NOT NULL,
+--   `start_date` date NOT NULL,
+--   `end_date` date NOT NULL,
 --   `completed_at` datetime,
 --   PRIMARY KEY (`id`)
 -- );

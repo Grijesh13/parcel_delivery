@@ -4,7 +4,6 @@ package dto
 type ESParcel struct {
 	MySrcLoc             Loc      `json:"mysrc"`
 	MyDestLoc            Loc      `json:"mydest"`
-	PickUpStart          string   `json:"pick_up_start"`
 	UserName             string   `json:"username"`
 	Note                 string   `json:"note"`
 	Items                []Item   `json:"items"`
@@ -19,7 +18,8 @@ type ESParcel struct {
 	Price                int      `json:"price"`
 	CompletedAt          string   `json:"completed_at"`
 	IsNegotiable         bool     `json:"is_negotiable"`
-	ShipDate             string   `json:"ship_date"`
+	PickUpStart          string   `json:"pick_up_start"`
+	PickUpEnd            string   `json:"pick_up_end"`
 	NumberItems          int      `json:"num_items"`
 	NetWeight            int      `json:"net_weight"`
 	Categories           []string `json:"categories"`

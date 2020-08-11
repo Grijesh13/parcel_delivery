@@ -13,7 +13,8 @@ type Parcel struct {
 	SourceLongitude      float64 `json:"src_long"`
 	DestinationLatitude  float64 `json:"dest_lat"`
 	DestinationLongitude float64 `json:"dest_long"`
-	ShipDate             string  `json:"ship_date"`
+	PickUpStart          string  `json:"pick_up_start"`
+	PickUpEnd            string  `json:"pick_up_end"`
 	CreatedAt            string  `json:"created_at"`
 	Status               string  `json:"status"`
 	Price                int     `json:"price"`

@@ -30,7 +30,7 @@ func AddTravel(w http.ResponseWriter, r *http.Request) {
 
 	// set the created_at for the new user to be added
 	currentTime := time.Now()
-	currentTS := currentTime.Format("2006-01-02 15:04:05")
+	currentTS := currentTime.Format("2006-01-02")
 	newEvent.CreatedAt = currentTS
 
 	// set the status
