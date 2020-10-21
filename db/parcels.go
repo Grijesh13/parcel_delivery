@@ -24,7 +24,7 @@ type ParcelsImpl struct {
 
 // GetParcels ...
 func (impl *ParcelsImpl) GetParcels(username string) []*dto.Parcel {
-	sqlQuery := "SELECT id, username, note, items, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, pick_up_start, pick_up_end, created_at, status, price, is_negotiable, completed_at FROM parcel_delivery.parcels WHERE username = ? ORDER BY created_at DESC"
+	sqlQuery := "SELECT id, username, note, sql_items, src_address, dest_address, src_lat, src_long, dest_lat, dest_long, pick_up_date_start, pick_up_date_end, created_at, status, price, is_negotiable, completed_at FROM parcel_delivery.parcels WHERE username = ? ORDER BY created_at DESC"
 	stmt, err := impl.DB.Prepare(sqlQuery)
 	defer closeStmt(stmt)
 	if err != nil {

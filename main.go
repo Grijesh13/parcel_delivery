@@ -21,7 +21,7 @@ func startHTTPServer() {
 	router.HandleFunc("/getParcels", apis.GetParcels).Methods("POST")
 	// TRAVEL APIs
 	router.HandleFunc("/addTravel", apis.AddTravel).Methods("POST")
-	router.HandleFunc("/getTravelsForUser", apis.GetParcelsForUser).Methods("POST")
+	router.HandleFunc("/getTravelsForUser", apis.GetTravelsForUser).Methods("POST")
 	router.HandleFunc("/getTravels", apis.GetTravels).Methods("POST")
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
