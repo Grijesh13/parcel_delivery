@@ -71,6 +71,8 @@ func GetTravels(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sort := map[string]interface{}{
+		"from": newEvent.From,
+		"size": newEvent.Many,
 		"query": map[string]interface{}{
 			"bool": map[string]interface{}{
 				"filter": filter,
@@ -92,8 +94,6 @@ func GetTravels(w http.ResponseWriter, r *http.Request) {
 	search, searchErr :=	global.ES2.Search().
 															Index(global.ESTravelIndex).
 															Source(string(query)).
-															From(newEvent.From).
-															Size(newEvent.Many).
 															Do(context.Background())
 
 	if searchErr != nil {

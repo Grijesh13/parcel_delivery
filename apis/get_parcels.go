@@ -95,6 +95,8 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sort := map[string]interface{}{
+		"from": newEvent.From,
+		"size": newEvent.Many,
 		"query": map[string]interface{}{
 			"bool": map[string]interface{}{
 				"filter": filter,
@@ -117,8 +119,6 @@ func GetParcels(w http.ResponseWriter, r *http.Request) {
 	search, searchErr :=	global.ES2.Search().
 															Index(global.ESParcelIndex).
 															Source(string(query)).
-															From(newEvent.From).
-															Size(newEvent.Many).
 															Do(context.Background())
 
 	if searchErr != nil {
